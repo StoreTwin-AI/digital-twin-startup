@@ -1,0 +1,10 @@
+{
+  "name": "storetwin-ai-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix trialspace",
+    "build": "npm run build --prefix trialspace",
+    "start": "npm run start --prefix trialspace",
+    "install:app": "npm install --prefix trialspace"
+  }
+}
