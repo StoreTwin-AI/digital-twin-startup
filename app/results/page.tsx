@@ -56,8 +56,10 @@ function ResultsContent() {
   useEffect(() => {
     if (!wantsAnalyzing) return;
 
-    setStatus("analyzing");
-    setSession(null);
+    queueMicrotask(() => {
+      setStatus("analyzing");
+      setSession(null);
+    });
 
     const interval = setInterval(() => {
       setStep((s) => s + 1);
@@ -87,22 +89,24 @@ function ResultsContent() {
 
     let cancelled = false;
 
-    try {
-      const loaded = loadOrFallback();
-      if (!cancelled) {
-        saveSession(loaded);
-        setSession(loaded);
-        setStatus("ready");
+    queueMicrotask(() => {
+      try {
+        const loaded = loadOrFallback();
+        if (!cancelled) {
+          saveSession(loaded);
+          setSession(loaded);
+          setStatus("ready");
+        }
+      } catch (error) {
+        console.error("[TrialSpace] Initial session load failed:", error);
+        if (!cancelled) {
+          const fallback = createFallbackSession();
+          saveSession(fallback);
+          setSession(fallback);
+          setStatus("ready");
+        }
       }
-    } catch (error) {
-      console.error("[TrialSpace] Initial session load failed:", error);
-      if (!cancelled) {
-        const fallback = createFallbackSession();
-        saveSession(fallback);
-        setSession(fallback);
-        setStatus("ready");
-      }
-    }
+    });
 
     return () => {
       cancelled = true;

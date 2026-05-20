@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { KakaoMap } from "@/components/map/KakaoMap";
+import { NaverMap } from "@/components/map/NaverMap";
 import { DistrictCard } from "@/components/map/DistrictCard";
 import { StepIndicator } from "@/components/layout/StepIndicator";
 import { saveDistrict } from "@/lib/session";
@@ -46,7 +46,7 @@ export default function MapPage() {
           animate={{ opacity: 1, x: 0 }}
           className="lg:col-span-3"
         >
-          <KakaoMap onSelect={handleSelect} selected={selected} />
+          <NaverMap onSelect={handleSelect} selected={selected} />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 16 }}

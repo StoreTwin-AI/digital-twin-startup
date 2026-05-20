@@ -10,10 +10,15 @@ import type { StartupInput } from "@/lib/types";
 
 interface StartupFormProps {
   districtName?: string;
-  onSubmit: (input: StartupInput) => void;
+  onSubmit: (input: StartupInput) => void | Promise<void>;
+  submitting?: boolean;
 }
 
-export function StartupForm({ districtName, onSubmit }: StartupFormProps) {
+export function StartupForm({
+  districtName,
+  onSubmit,
+  submitting = false,
+}: StartupFormProps) {
   const [businessType, setBusinessType] = useState<string>(BUSINESS_TYPES[0]);
   const [operatingHours, setOperatingHours] = useState<string>(OPERATING_HOURS[1]);
   const [menuName, setMenuName] = useState("");
@@ -129,9 +134,9 @@ export function StartupForm({ districtName, onSubmit }: StartupFormProps) {
           type="submit"
           size="lg"
           className="w-full"
-          disabled={!menuName.trim()}
+          disabled={!menuName.trim() || submitting}
         >
-          AI 분석 시작
+          {submitting ? "AI 분석 요청 중..." : "AI 분석 시작"}
           <ChevronRight className="h-4 w-4" />
         </Button>
       </form>

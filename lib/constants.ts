@@ -1,6 +1,9 @@
 export const KAKAO_MAP_KEY =
   process.env.NEXT_PUBLIC_KAKAO_MAP_KEY ?? "8870e6e1b24f9c8816053ce94653aa32";
 
+export const NAVER_MAP_CLIENT_ID =
+  process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID ?? "d5x5i9d0jo";
+
 export const SESSION_KEY = "trialspace_session";
 
 export const BUSINESS_TYPES = [

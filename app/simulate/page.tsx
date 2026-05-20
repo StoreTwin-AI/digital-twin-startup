@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { StartupForm } from "@/components/form/StartupForm";
@@ -8,21 +8,20 @@ import { StepIndicator } from "@/components/layout/StepIndicator";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { MapPin } from "lucide-react";
-import { readSession, saveInput } from "@/lib/session";
+import { createAnalysisSession } from "@/lib/api-client";
+import { generateAnalysis } from "@/lib/analysis";
+import { readSession, saveInput, saveSession } from "@/lib/session";
 import type { District, StartupInput } from "@/lib/types";
 
 export default function SimulatePage() {
   const router = useRouter();
-  const [district, setDistrict] = useState<District | null>(null);
+  const [district] = useState<District | null>(() => readSession().district ?? null);
+  const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const session = readSession();
-    if (session.district) {
-      setDistrict(session.district);
-    }
-  }, []);
+  const handleSubmit = async (input: StartupInput) => {
+    if (submitting) return;
+    setSubmitting(true);
 
-  const handleSubmit = (input: StartupInput) => {
     try {
       saveInput(input);
       const stored = readSession();
@@ -33,10 +32,23 @@ export default function SimulatePage() {
         router.push("/map");
         return;
       }
+
+      const session = await createAnalysisSession(stored.district, input);
+      saveSession(session);
       router.push("/results?analyzing=1");
     } catch (error) {
       console.error("[TrialSpace] Submit failed:", error);
+      if (district) {
+        saveSession({
+          district,
+          input,
+          analysis: generateAnalysis(district, input),
+          analyzedAt: new Date().toISOString(),
+        });
+      }
       router.push("/results?analyzing=1");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -67,7 +79,11 @@ export default function SimulatePage() {
           </Button>
         </GlassCard>
       ) : (
-        <StartupForm districtName={district.name} onSubmit={handleSubmit} />
+        <StartupForm
+          districtName={district.name}
+          onSubmit={handleSubmit}
+          submitting={submitting}
+        />
       )}
     </motion.div>
   );
